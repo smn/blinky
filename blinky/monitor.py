@@ -1,0 +1,57 @@
+import os
+import click
+import pika
+from pika.exceptions import ConnectionClosed
+import json
+
+
+@click.command()
+@click.option('--broker-url', default='amqp://guest:guest@localhost/')
+@click.option('--settings', default='blinky.settings')
+@click.option('--queue-name', default='heartbeat.inbound')
+@click.option('--exchange', default='vumi.health')
+@click.option('--verbose/--no-verbose', default=False)
+def run(broker_url, settings, queue_name, exchange, verbose):
+
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings)
+
+    import django
+    from django.conf import settings
+    django.setup()
+
+    from blinky.app.models import HeartBeat
+
+    parameters = pika.URLParameters(broker_url)
+
+    try:
+        connection = pika.BlockingConnection(parameters)
+    except (ConnectionClosed,) as e:
+        raise click.ClickException('Unable to connect to AMQP: %r' % e)
+
+    channel = connection.channel()
+    channel.exchange_declare(exchange=exchange,
+                             type='direct',
+                             durable=True)
+    channel.queue_bind(exchange=exchange,
+                       queue=queue_name)
+
+    def callback(ch, method, properties, body):
+        heartbeat = HeartBeat.ingest(json.loads(body))
+        if verbose:
+            click.echo('<3 from %s:%s at %s.' % (
+                heartbeat.system, heartbeat.worker,
+                heartbeat.timestamp.isoformat()))
+
+    channel.basic_consume(callback,
+                          queue=queue_name,
+                          no_ack=True)
+    try:
+        channel.start_consuming()
+    except (ConnectionClosed,) as e:
+        raise click.ClickException('Lost Connection to AMQP: %r' % e)
+    except (KeyboardInterrupt,) as e:
+        connection.close()
+
+
+if __name__ == '__main__':
+    run()

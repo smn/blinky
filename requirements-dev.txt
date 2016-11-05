@@ -1,0 +1,7 @@
+flake8
+coverage
+Sphinx
+pytest
+pytest-xdist
+pytest-cov
+pytest-django

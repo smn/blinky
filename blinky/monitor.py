@@ -38,8 +38,8 @@ def run(broker_url, settings, queue_name, exchange, verbose):
     def callback(ch, method, properties, body):
         heartbeat = HeartBeat.ingest(json.loads(body))
         if verbose:
-            click.echo('<3 from %s:%s at %s.' % (
-                heartbeat.system, heartbeat.worker,
+            click.echo('<3 from %s at %s.' % (
+                heartbeat.worker_instance,
                 heartbeat.timestamp.isoformat()))
 
     channel.basic_consume(callback,

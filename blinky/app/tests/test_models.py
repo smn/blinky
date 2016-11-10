@@ -34,3 +34,6 @@ class TestHeartBeat(TestCase):
         self.assertEqual(System.objects.count(), 1)
         self.assertEqual(Worker.objects.count(), 1)
         self.assertEqual(HeartBeat.objects.count(), 2)
+
+    def test_status_change(self):
+        pass

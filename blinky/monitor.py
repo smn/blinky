@@ -19,7 +19,7 @@ def run(broker_url, settings, queue_name, exchange, verbose):
     from django.conf import settings
     django.setup()
 
-    from blinky.app.models import HeartBeat
+    from blinky.core.models import HeartBeat
 
     parameters = pika.URLParameters(broker_url)
 

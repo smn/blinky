@@ -1,5 +1,5 @@
 from django.contrib import admin
-from blinky.app.models import System, WorkerType, WorkerInstance, HeartBeat
+from blinky.core.models import System, WorkerType, WorkerInstance, HeartBeat
 
 
 @admin.register(HeartBeat)

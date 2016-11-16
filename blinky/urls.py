@@ -15,7 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from blinky.core.views import (
+    WorkerTypeList, WorkerInstanceList, HeartBeatList)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$',
+        WorkerTypeList.as_view(), name='workertypes'),
+    url(r'^workertype/(?P<workertype_pk>\d+)/$',
+        WorkerInstanceList.as_view(), name='workerinstances'),
+    url(r'^workertype/(?P<workertype_pk>\d+)/(?P<workerinstance_pk>\d+)/$',
+        HeartBeatList.as_view(), name='heartbeats'),
 ]

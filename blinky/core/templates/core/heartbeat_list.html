@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Heartbeats for <a href="{% url 'workerinstances' workertype_pk=workerinstance.worker_type.pk %}">{{workerinstance}}</a></h2>
+    <table>
+      <thead>
+        <tr>
+          <td>System ID</td>
+          <td>Worker Type</td>
+          <td>Worker Instance</td>
+          <td>Heartbeat Generated At</td>
+          <td>Heartbeat Received At</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for heartbeat in object_list %}
+          {% with system=heartbeat.system worker_type=heartbeat.worker_type worker_instance=heartbeat.worker_instance %}
+          <tr>
+            <td>{{heartbeat.system.system_id}}</td>
+            <td><a href="{% url 'workertypes' %}">{{worker_type.worker_name}}</a></td>
+            <td><a href="{% url 'workerinstances' workertype_pk=worker_type.pk %}">{{worker_instance}}</a></td>
+            <td>{{heartbeat.timestamp}}</td>
+            <td>{{heartbeat.created_at}}</td>
+          </tr>
+          {% endwith %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if paginator %}
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
+
+      <span class="current">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      </span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">next</a>
+      {% endif %}
+    {% endif %}
+{% endblock %}

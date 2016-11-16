@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Worker Types</h2>
+    <table>
+      <thead>
+        <tr>
+          <td>Worker Type</td>
+          <td>System ID</td>
+          <td>Capacity</td>
+          <td>Status</td>
+          <td>Active</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for workertype in object_list %}
+          <tr class="{% if workertype.online %}online{% else %}offline{% endif %}">
+            <td><a href="{% url 'workerinstances' workertype_pk=workertype.pk %}">{{workertype.worker_name}}</a></td>
+            <td>{{workertype.system.system_id}}</td>
+            <td class="{{workertype.capacity|lower}}">{{workertype.capacity}}</td>
+            <td>{% if workertype.online %}Online{% else %}Offline{% endif %}</td>
+            <td>{% if workertype.is_active %}Yes{% else %}No{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

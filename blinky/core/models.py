@@ -29,6 +29,7 @@ class System(models.Model):
 class WorkerType(models.Model):
 
     DEFAULT_HEARTBEAT_INTERVAL = 10
+    CAPACITY_UNKNOWN = 'CAPACITY_UNKNOWN'
     CAPACITY_GOOD = 'CAPACITY_GOOD'
     CAPACITY_OVER = 'CAPACITY_OVER'
     CAPACITY_UNDER = 'CAPACITY_UNDER'
@@ -66,6 +67,8 @@ class WorkerType(models.Model):
     @property
     def capacity(self):
         instance_count = len(self.instances_online)
+        if not instance_count:
+            return self.CAPACITY_UNKNOWN
         if self.minimum_capacity <= instance_count <= self.maximum_capacity:
             return self.CAPACITY_GOOD
         elif instance_count < self.minimum_capacity:

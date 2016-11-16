@@ -2,8 +2,13 @@ from __future__ import unicode_literals
 
 import pytz
 from django.db import models
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.utils import timezone
+
+SECOND = 1
+MINUTE = 60 * SECOND
+HOUR = 60 * MINUTE
+DAY = 24 * HOUR
 
 
 class System(models.Model):
@@ -28,7 +33,7 @@ class System(models.Model):
 
 class WorkerType(models.Model):
 
-    DEFAULT_HEARTBEAT_INTERVAL = 10
+    DEFAULT_HEARTBEAT_INTERVAL = 10 * SECOND
     CAPACITY_UNKNOWN = 'CAPACITY_UNKNOWN'
     CAPACITY_GOOD = 'CAPACITY_GOOD'
     CAPACITY_OVER = 'CAPACITY_OVER'
@@ -77,9 +82,9 @@ class WorkerType(models.Model):
             return self.CAPACITY_OVER
 
     @classmethod
-    def garbage_collect(cls, gc_interval=60, now=None):
+    def garbage_collect(cls, gc_interval=(1 * MINUTE), now=None):
         now = now or timezone.now()
-        for worker_type in WorkerType.objects.all():
+        for worker_type in cls.objects.all():
             last_instance = worker_type.last_seen_instance
             delta = last_instance.last_seen_at - now
             worker_type.is_active = (
@@ -141,6 +146,12 @@ class HeartBeat(models.Model):
             worker_instance=worker_instance,
             timestamp=datetime.fromtimestamp(
                 data['timestamp']).replace(tzinfo=pytz.UTC))
+
+    @classmethod
+    def garbage_collect(cls, gc_interval=(14 * DAY), now=None):
+        now = now or timezone.now()
+        cut_off = now - timedelta(seconds=gc_interval)
+        return cls.objects.filter(created_at__lte=cut_off).delete()
 
     def __unicode__(self):
         return u'%s @ %s' % (self.worker_instance, self.timestamp.isoformat())

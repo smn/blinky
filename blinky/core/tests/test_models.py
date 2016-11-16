@@ -4,7 +4,8 @@ import pytz
 
 from django.test import TestCase
 from django.utils import timezone
-from blinky.core.models import System, WorkerInstance, WorkerType, HeartBeat
+from blinky.core.models import (
+    System, WorkerInstance, WorkerType, HeartBeat, DAY)
 
 
 def reload_record(record):
@@ -92,6 +93,16 @@ class TestHeartBeat(BlinkMixin, TestCase):
         self.assertEqual(WorkerType.objects.count(), 1)
         self.assertEqual(WorkerInstance.objects.count(), 1)
         self.assertEqual(HeartBeat.objects.count(), 2)
+
+    def test_garbage_collect(self):
+        heartbeat = self.mk_heartbeat()
+        heartbeat.created_at = timezone.now() - timedelta(seconds=(1 * DAY))
+        heartbeat.save()
+        self.assertTrue(HeartBeat.objects.exists())
+        HeartBeat.garbage_collect(gc_interval=(2 * DAY))
+        self.assertTrue(HeartBeat.objects.exists())
+        HeartBeat.garbage_collect(gc_interval=(1 * DAY))
+        self.assertFalse(HeartBeat.objects.exists())
 
 
 class TestWorkerInstance(BlinkMixin, TestCase):

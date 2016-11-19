@@ -6,7 +6,8 @@ import json
 
 
 @click.command()
-@click.option('--broker-url', default='amqp://guest:guest@localhost/')
+@click.option('--broker-url',
+              default='amqp://guest:guest@localhost/', envvar='BROKER_URL')
 @click.option('--settings', default='blinky.settings')
 @click.option('--queue-name', default='heartbeat.inbound')
 @click.option('--exchange', default='vumi.health')

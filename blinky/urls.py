@@ -15,15 +15,20 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import views as auth_views
 from blinky.core.views import (
     WorkerTypeList, WorkerInstanceList, HeartBeatList)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^accounts/login/$', auth_views.login, {
+        'template_name': 'core/login.html',
+    }, name='login'),
     url(r'^$',
-        WorkerTypeList.as_view(), name='workertypes'),
+        login_required(WorkerTypeList.as_view()), name='workertypes'),
     url(r'^workertype/(?P<workertype_pk>\d+)/$',
-        WorkerInstanceList.as_view(), name='workerinstances'),
+        login_required(WorkerInstanceList.as_view()), name='workerinstances'),
     url(r'^workertype/(?P<workertype_pk>\d+)/(?P<workerinstance_pk>\d+)/$',
-        HeartBeatList.as_view(), name='heartbeats'),
+        login_required(HeartBeatList.as_view()), name='heartbeats'),
 ]

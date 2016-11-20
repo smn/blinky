@@ -19,7 +19,8 @@ class JunebugInstance(models.Model):
         response.raise_for_status()
         channels_list = response.json()
         for uuid in channels_list['result']:
-            response = requests.get('%s/channels/%s' % (self.url, uuid))
+            response = requests.get('%s/channels/%s' % (self.url, uuid),
+                                    auth=(self.username, self.password))
             yield response.json()['result']
 
     def format_channel_name(self, channel):

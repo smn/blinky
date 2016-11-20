@@ -4,13 +4,16 @@ Blinky
 .. image:: https://img.shields.io/travis/smn/blinky.svg
         :target: https://travis-ci.org/smn/blinky
 
-.. image:: https://img.shields.io/pypi/v/Blinky.svg
-        :target: https://pypi.python.org/pypi/Blinky
+.. image:: https://img.shields.io/pypi/v/blinky.svg
+        :target: https://pypi.python.org/pypi/blinky
 
-.. image:: https://coveralls.io/repos/smn/blinky/badge.png?branch=develop
-    :target: https://coveralls.io/r/smn/blinky?branch=develop
-    :alt: Code Coverage
 
-.. image:: https://readthedocs.org/projects/Blinky/badge/?version=latest
-    :target: https://Blinky.readthedocs.org
-    :alt: Blinky Docs
+Blinky provides uptime for Vumi workers & Junebug Channels
+
+::
+
+  docker run --rm -it \
+    -e SUPERUSER_PASSWORD='password' \
+    -e BROKER_URL='amqp://username:password@host/vhost' \
+    -p 8000:8000 \
+    sdehaan/blinky

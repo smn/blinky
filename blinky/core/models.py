@@ -93,7 +93,7 @@ class WorkerType(models.Model):
             worker_type.save()
 
     def __unicode__(self):
-        return self.worker_name
+        return self.worker_friendly_name or self.worker_name
 
 
 class WorkerInstance(models.Model):

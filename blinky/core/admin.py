@@ -12,8 +12,8 @@ class HeartBeatAdmin(admin.ModelAdmin):
 class WorkerAdmin(admin.ModelAdmin):
     list_filter = ('system',)
     list_display = (
-        'system', 'worker_name', 'created_at', 'online', 'capacity',
-        'last_seen_at')
+        'system', 'worker_name', 'worker_friendly_name', 'created_at',
+        'online', 'capacity', 'last_seen_at')
 
     def last_seen_at(self, worker_type):
         last_instance = worker_type.last_seen_instance

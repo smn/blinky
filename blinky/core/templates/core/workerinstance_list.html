@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Worker Instances for <a href="{% url 'workertypes' %}">{{workertype}}</a></h2>
+    <table>
+      <thead>
+        <tr>
+          <td>Hostname</td>
+          <td>Pid</td>
+          <td>Last seen at</td>
+          <td>Status</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for workerinstance in object_list %}
+          <tr class="{% if workerinstance.online %}online{% else %}offline{% endif %}">
+            <td><a href="{% url 'heartbeats' workertype_pk=workertype.pk workerinstance_pk=workerinstance.pk %}">{{workerinstance.hostname}}</a></td>
+            <td>{{workerinstance.pid}}</td>
+            <td>{{workerinstance.last_seen_at}}</td>
+            <td>{% if workerinstance.online %}Online{% else %}Offline{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

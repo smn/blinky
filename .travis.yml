@@ -1,0 +1,33 @@
+sudo: false
+language: python
+python:
+  - "2.7"
+cache:
+  directories:
+    - $HOME/.pip-cache/
+
+env:
+  - TZ=UTC
+
+install:
+  - pip install coveralls
+  - pip install wheel
+  - pip install -r requirements-dev.txt
+  - pip install -e .
+
+script:
+  - flake8
+  - py.test --cov=blinky --cov-report=term
+
+after_success:
+  - coveralls
+
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: smn
+  password:
+    secure: "M/Y89c7dzJFEZj6oM42JXQ0D0DQICn8job08NL97CY3G2Kzg/kGdiznam+QR+K8ztVZa8+xIY6Pqu5on2q2+CaAVytKIUEl4yOjkaYBB3kOvHGLEmMYC5bvrX3JNsHq7lOKXTySUrzzseCJ0H/p6kEyBmK1pWCgzFYOpzZSanMWVQnIgb+vO9ETXo8z9IAUa8W2JuRQMkkv/d+DPeF3b+6oEBBUHGCQuf8QklxU8VVJ8x9RzxylOWC7Iu6uwxPgFekYibG+CJpnD/BKCrMCal7chgDS7EdfNl+68qR5H0yBnjTIoqOr156oeAGLJmxzSEYYdJBw55VFFjI+/y8qHFtBLezz5+53MCJR61OYRoid9/FLOBNisK2YCI82if8CHtkigb+iFpRMPa5nkmKV0B2xIU2dx2eQVlY/0O04XG8r7HGCrX0h+Lxt6fe0rCmaszWIjQB2QLFMT8dRJr4l5875dLJDmoVEDKnc4HqCvEVwlCkNU1yANVt+V/DrMP8DP/G7v/3WujC023/ZDE2Xgx0Fbp/V53VoZUTTys5uR+uzveh3a9xhz4ZSull1Vejde2bRGoGFYtm0BxGLX15PWOfM0+ACiUcRowLZv+KPHDBHyMg1+x7yiKuVnbFqyMcY58HFgaz3b1/B4P2kUNGeZtelJpZJbjqV/Gi4bQW5xios="
+  on:
+    tags: true
+    all_branches: true

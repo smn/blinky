@@ -1,0 +1,44 @@
+{% load static %}
+<html>
+  <head>
+    <title>Blinky</title>
+    <!--
+    <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/bootstrap-theme.min.css' %}">
+    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
+    -->
+    <style>
+      body {
+        font-family: helvetica;
+        font-size: 1em;
+      }
+
+      .content {
+        margin: 100px 100px;
+      }
+
+      tr.online td.capacity_under {
+        background-color: pink;
+      }
+
+      tr.online td.capacity_over {
+        background-color: lightblue;
+      }
+
+      tr.online td {
+        background-color: lightgreen;
+      }
+
+      tr.offline td {
+        background-color: pink;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </body>
+</html>

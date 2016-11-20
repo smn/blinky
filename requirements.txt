@@ -1,0 +1,6 @@
+pika==0.10.0
+Django<1.11,>=1.10
+click<7.0,>=6.0
+dj-database-url==0.4.1
+pytz==2016.7
+whitenoise==3.2.2

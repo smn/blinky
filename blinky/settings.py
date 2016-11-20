@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import dj_database_url
+from kombu import Exchange, Queue
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#v79eeny)cc@93(#)p$kbj#v$0*%7v*yw-wlaaiu*1a(-n0w8t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blinky.core',
+    'blinky.junebug',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +122,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+CELERY_BROKER_URL = os.environ.get(
+    'BROKER_URL', 'amqp://guest:guest@localhost/')
+
+CELERY_TASK_DEFAULT_QUEUE = 'blinky'
+CELERY_QUEUES = (
+    Queue('blinky',
+          Exchange('blinky'),
+          routing_key='blinky'))

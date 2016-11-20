@@ -40,7 +40,7 @@ class WorkerType(models.Model):
     CAPACITY_UNDER = 'CAPACITY_UNDER'
 
     system = models.ForeignKey(System)
-    worker_friendly_name = models.TextField(null=True)
+    worker_friendly_name = models.TextField(null=True, blank=True)
     worker_name = models.CharField(max_length=255)
     heartbeat_interval = models.IntegerField(
         default=DEFAULT_HEARTBEAT_INTERVAL)

@@ -16,7 +16,7 @@
           {% with system=heartbeat.system worker_type=heartbeat.worker_type worker_instance=heartbeat.worker_instance %}
           <tr>
             <td>{{heartbeat.system.system_id}}</td>
-            <td><a href="{% url 'workertypes' %}">{{worker_type.worker_name}}</a></td>
+            <td><a href="{% url 'workertypes' %}">{{worker_type}}</a></td>
             <td>{{heartbeat.timestamp}}</td>
             <td>{{heartbeat.created_at}}</td>
           </tr>

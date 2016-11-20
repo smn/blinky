@@ -7,7 +7,7 @@ if [ -n "$SUPERUSER_PASSWORD" ]; then
   echo "from django.contrib.auth.models import User
 if not User.objects.filter(username='admin').exists():
     User.objects.create_superuser('admin', 'admin@example.com', '$SUPERUSER_PASSWORD')
-" | su-exec django-admin shell
+" | django-admin shell --setting=blinky.settings
   echo "Created superuser with username 'admin' and password '$SUPERUSER_PASSWORD'"
 fi
 

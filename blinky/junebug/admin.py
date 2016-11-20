@@ -8,6 +8,8 @@ def update_label(modeladmin, request, queryset):
     for junebug in queryset.all():
         for worker in WorkerType.objects.all():
             update_workers_junebug_info.delay(workertype_pk=worker.pk)
+
+
 update_label.short_description = "Sync WorkerType names"
 
 

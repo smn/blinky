@@ -5,3 +5,5 @@ dj-database-url==0.4.1
 pytz==2016.7
 whitenoise==3.2.2
 celery==4.0.0
+requests==2.12.1
+responses==0.5.1

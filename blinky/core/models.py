@@ -40,6 +40,7 @@ class WorkerType(models.Model):
     CAPACITY_UNDER = 'CAPACITY_UNDER'
 
     system = models.ForeignKey(System)
+    worker_friendly_name = models.TextField(null=True)
     worker_name = models.CharField(max_length=255)
     heartbeat_interval = models.IntegerField(
         default=DEFAULT_HEARTBEAT_INTERVAL)
@@ -92,7 +93,7 @@ class WorkerType(models.Model):
             worker_type.save()
 
     def __unicode__(self):
-        return self.worker_name
+        return self.worker_friendly_name or self.worker_name
 
 
 class WorkerInstance(models.Model):

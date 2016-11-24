@@ -127,7 +127,7 @@ class HeartBeat(models.Model):
     system = models.ForeignKey(System)
     worker_type = models.ForeignKey(WorkerType)
     worker_instance = models.ForeignKey(WorkerInstance)
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

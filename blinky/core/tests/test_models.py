@@ -53,7 +53,7 @@ class TestWorkerInstance(BlinkMixin, TestCase):
 
     def test_online(self):
         heartbeat = self.mk_heartbeat()
-        self.assertTrue(heartbeat.worker_instance.online)
+        self.assertTrue(heartbeat.worker_instance.is_online())
 
     def test_offline(self):
         heartbeat = self.mk_heartbeat()
@@ -61,34 +61,42 @@ class TestWorkerInstance(BlinkMixin, TestCase):
         heartbeat.timestamp = (heartbeat.timestamp - timedelta(
             worker_type.heartbeat_interval + 1))
         heartbeat.save()
-        self.assertFalse(heartbeat.worker_instance.online)
+        self.assertFalse(heartbeat.worker_instance.is_online())
 
     def test_last_seen_at(self):
         now = datetime(2016, 11, 16, tzinfo=pytz.UTC)
         heartbeat = self.mk_heartbeat(timestamp=now)
         self.assertEqual(
-            heartbeat.worker_instance.last_seen_at, now)
-        self.assertFalse(heartbeat.worker_instance.online)
+            heartbeat.worker_instance.last_seen_at(), now)
+        self.assertFalse(heartbeat.worker_instance.is_online())
+
+    def test_online_with_timestamp(self):
+        timestamp = timezone.now() - timedelta(days=1)
+        timestamp_check = timestamp + timedelta(seconds=5)
+        heartbeat = self.mk_heartbeat(timestamp=timestamp)
+        worker_instance = heartbeat.worker_instance
+        self.assertFalse(worker_instance.is_online())
+        self.assertTrue(worker_instance.is_online(timestamp_check))
 
 
 class TestWorkerType(BlinkMixin, TestCase):
 
     def test_online(self):
         heartbeat = self.mk_heartbeat()
-        self.assertTrue(heartbeat.worker_type.online)
+        self.assertTrue(heartbeat.worker_type.is_online())
 
     def test_instances_online(self):
         heartbeat = self.mk_heartbeat()
         worker_type = heartbeat.worker_type
-        self.assertTrue(worker_type.online)
+        self.assertTrue(worker_type.is_online())
 
     def test_instances_instances_online(self):
         heartbeat1 = self.mk_heartbeat(hostname='host1')
         heartbeat2 = self.mk_heartbeat(hostname='host2')
         worker_type = heartbeat1.worker_type
-        self.assertTrue(worker_type.online)
+        self.assertTrue(worker_type.is_online())
         self.assertEqual(
-            set(worker_type.instances_online),
+            set(worker_type.instances_online()),
             set([heartbeat1.worker_instance,
                  heartbeat2.worker_instance]))
 
@@ -97,7 +105,7 @@ class TestWorkerType(BlinkMixin, TestCase):
         worker_type.minimum_capacity = 0
         worker_type.maximum_capacity = 10
         worker_type.save()
-        self.assertEqual(worker_type.capacity, WorkerType.CAPACITY_GOOD)
+        self.assertEqual(worker_type.capacity(), WorkerType.CAPACITY_GOOD)
 
     def test_capacity_under(self):
         system, worker_type = self.mk_system_capacity(
@@ -105,7 +113,7 @@ class TestWorkerType(BlinkMixin, TestCase):
         worker_type.minimum_capacity = 5
         worker_type.maximum_capacity = 10
         worker_type.save()
-        self.assertEqual(worker_type.capacity, WorkerType.CAPACITY_UNDER)
+        self.assertEqual(worker_type.capacity(), WorkerType.CAPACITY_UNDER)
 
     def test_capacity_over(self):
         system, worker_type = self.mk_system_capacity(
@@ -113,7 +121,7 @@ class TestWorkerType(BlinkMixin, TestCase):
         worker_type.minimum_capacity = 1
         worker_type.maximum_capacity = 10
         worker_type.save()
-        self.assertEqual(worker_type.capacity, WorkerType.CAPACITY_OVER)
+        self.assertEqual(worker_type.capacity(), WorkerType.CAPACITY_OVER)
 
     def test_last_seen_at(self):
         now = timezone.now()
@@ -126,7 +134,7 @@ class TestWorkerType(BlinkMixin, TestCase):
         self.assertEqual(heartbeat1.worker_type,
                          heartbeat1.worker_type)
         worker_type = heartbeat1.worker_type
-        self.assertEqual(worker_type.last_seen_instance,
+        self.assertEqual(worker_type.last_seen_instance(),
                          heartbeat1.worker_instance)
 
     def test_garbage_collect_remain_active(self):
@@ -146,16 +154,16 @@ class TestSystem(BlinkMixin, TestCase):
 
     def test_offline(self):
         system = self.mk_system()
-        self.assertFalse(system.online)
+        self.assertFalse(system.is_online())
 
     def test_online(self):
         heartbeat = self.mk_heartbeat()
-        self.assertTrue(heartbeat.system.online)
+        self.assertTrue(heartbeat.system.is_online())
 
     def test_workertypes_online(self):
         heartbeat1 = self.mk_heartbeat(worker_name='worker1')
         heartbeat2 = self.mk_heartbeat(worker_name='worker2')
         system = heartbeat1.system
         self.assertTrue(
-            set(system.workertypes_online),
+            set(system.workertypes_online()),
             set([heartbeat1.worker_type, heartbeat2.worker_type]))

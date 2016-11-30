@@ -5,4 +5,3 @@ pytest>=2.9
 pytest-xdist
 pytest-cov
 pytest-django
-tox

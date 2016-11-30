@@ -2,8 +2,7 @@ import os
 import click
 import pika
 from pika.exceptions import ConnectionClosed
-from urlparse import urlparse, urlunparse
-from urllib import quote_plus
+from six.moves.urllib_parse import quote_plus, urlparse, urlunparse
 import json
 import re
 

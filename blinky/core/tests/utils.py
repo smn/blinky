@@ -43,7 +43,9 @@ class BlinkMixin(object):
             worker_instance=worker_instance, timestamp=timestamp)
         return heartbeat
 
-    def mk_system_capacity(self, online_count=0, offline_count=0):
+    def mk_system_capacity(self, online_count=0, offline_count=0,
+                           offline_delta=1, now=None):
+        now = now or timezone.now()
         system = self.mk_system()
         for online_worker in range(online_count):
             heartbeat = self.mk_heartbeat(system_id=system.system_id,
@@ -51,9 +53,8 @@ class BlinkMixin(object):
                                               online_worker))
 
         for offline_worker in range(offline_count):
-            seconds_ago = timezone.now() - timedelta(
-                seconds=(WorkerType.DEFAULT_HEARTBEAT_INTERVAL +
-                         offline_worker + 1))
+            seconds = WorkerType.DEFAULT_HEARTBEAT_INTERVAL + offline_delta
+            seconds_ago = now - timedelta(seconds=seconds)
             heartbeat = self.mk_heartbeat(system_id=system.system_id,
                                           hostname='offline-host-%s' % (
                                               offline_worker),

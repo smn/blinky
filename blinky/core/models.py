@@ -15,17 +15,15 @@ class System(models.Model):
     system_id = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    @property
-    def workertypes_online(self):
+    def workertypes_online(self, timestamp=None):
         return [worker_type
                 for worker_type in self.workertype_set.filter(is_active=True)
-                if worker_type.online]
+                if worker_type.is_online(timestamp=timestamp)]
 
-    @property
-    def online(self):
+    def is_online(self, timestamp=None):
         return (
             self.workertype_set.filter(is_active=True).exists() and
-            all(self.workertypes_online))
+            all(self.workertypes_online(timestamp=timestamp)))
 
     def __unicode__(self):
         return self.system_id
@@ -49,30 +47,25 @@ class WorkerType(models.Model):
     maximum_capacity = models.IntegerField(default=10)
     is_active = models.BooleanField(default=True)
 
-    @property
     def last_seen_instance(self):
         return max(self.workerinstance_set.all(),
-                   key=lambda instance: instance.last_seen_at)
+                   key=lambda instance: instance.last_seen_at())
 
-    @property
-    def instances_online(self):
+    def instances_online(self, timestamp=None):
         return [worker_instance
                 for worker_instance in self.workerinstance_set.all()
-                if worker_instance.online]
+                if worker_instance.is_online(timestamp=timestamp)]
 
-    @property
-    def instances_offline(self):
+    def instances_offline(self, timestamp=None):
         return [worker_instance
                 for worker_instance in self.workerinstance_set.all()
-                if not worker_instance.online]
+                if not worker_instance.is_online(timestamp=timestamp)]
 
-    @property
-    def online(self):
-        return any(self.instances_online)
+    def is_online(self, timestamp=None):
+        return any(self.instances_online(timestamp=timestamp))
 
-    @property
-    def capacity(self):
-        instance_count = len(self.instances_online)
+    def capacity(self, timestamp=None):
+        instance_count = len(self.instances_online(timestamp))
         if not instance_count:
             return self.CAPACITY_UNKNOWN
         if self.minimum_capacity <= instance_count <= self.maximum_capacity:
@@ -86,8 +79,8 @@ class WorkerType(models.Model):
     def garbage_collect(cls, gc_interval=(1 * MINUTE), now=None):
         now = now or timezone.now()
         for worker_type in cls.objects.all():
-            last_instance = worker_type.last_seen_instance
-            delta = last_instance.last_seen_at - now
+            last_instance = worker_type.last_seen_instance()
+            delta = last_instance.last_seen_at() - now
             worker_type.is_active = (
                 abs(delta.total_seconds()) < float(gc_interval))
             worker_type.save()
@@ -102,14 +95,24 @@ class WorkerInstance(models.Model):
     pid = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-    @property
     def last_seen_at(self):
         return self.heartbeat_set.latest().timestamp
 
-    @property
-    def online(self):
-        last_interval = (self.heartbeat_set.latest().timestamp -
-                         timezone.now()).total_seconds()
+    def is_online(self, timestamp=None):
+        """
+        Check whether or not a WorkerInstance is online.
+        If a timestamp is given, check whether the WorkerInstance was online
+        at the given time.
+
+        :param timestamp datetime: Optional timestamp
+        :returns: bool
+        """
+        timestamp = timestamp or timezone.now()
+        queryset = self.heartbeat_set.all()
+        if timestamp:
+            queryset = queryset.filter(timestamp__lte=timestamp)
+        last_interval = (queryset.latest().timestamp -
+                         timestamp).total_seconds()
         return abs(last_interval) < self.worker_type.heartbeat_interval
 
     def __unicode__(self):
@@ -124,7 +127,7 @@ class HeartBeat(models.Model):
     system = models.ForeignKey(System)
     worker_type = models.ForeignKey(WorkerType)
     worker_instance = models.ForeignKey(WorkerInstance)
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -36,6 +36,9 @@ class WorkerType(models.Model):
     CAPACITY_GOOD = 'CAPACITY_GOOD'
     CAPACITY_OVER = 'CAPACITY_OVER'
     CAPACITY_UNDER = 'CAPACITY_UNDER'
+    STATUS_ONLINE = 'STATUS_ONLINE'
+    STATUS_OFFLINE = 'STATUS_OFFLINE'
+    STATUS_UNKNOWN = 'STATUS_UNKNOWN'
 
     system = models.ForeignKey(System)
     worker_friendly_name = models.TextField(null=True, blank=True)
@@ -46,6 +49,11 @@ class WorkerType(models.Model):
     minimum_capacity = models.IntegerField(default=0)
     maximum_capacity = models.IntegerField(default=10)
     is_active = models.BooleanField(default=True)
+    status = models.CharField(default=STATUS_UNKNOWN, max_length=255, choices=(
+        (STATUS_OFFLINE, 'Offline'),
+        (STATUS_ONLINE, 'Online'),
+        (STATUS_UNKNOWN, 'Unknown'),
+    ))
 
     def last_seen_instance(self):
         return max(self.workerinstance_set.all(),
@@ -110,9 +118,14 @@ class WorkerInstance(models.Model):
         timestamp = timestamp or timezone.now()
         queryset = self.heartbeat_set.all()
         if timestamp:
-            queryset = queryset.filter(timestamp__lte=timestamp)
+            queryset = queryset.filter(timestamp__lt=timestamp)
+
+        if not queryset.exists():
+            return False
+
         last_interval = (queryset.latest().timestamp -
                          timestamp).total_seconds()
+
         return abs(last_interval) < self.worker_type.heartbeat_interval
 
     def __unicode__(self):
@@ -132,6 +145,12 @@ class HeartBeat(models.Model):
 
     class Meta:
         get_latest_by = 'timestamp'
+
+    def previous(self):
+        return HeartBeat.objects.filter(
+            system=self.system, worker_type=self.worker_type,
+            worker_instance=self.worker_instance,
+            timestamp__lt=self.timestamp).order_by('-timestamp').first()
 
     @classmethod
     def ingest(cls, data):

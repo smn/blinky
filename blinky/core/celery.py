@@ -15,3 +15,14 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
+
+
+@app.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    from blinky.core.tasks import poll_worker_types, garbage_collect
+    sender.add_periodic_task(
+        60.0, poll_worker_types.s(),
+        name='poll worker types for being offline')
+    sender.add_periodic_task(
+        60.0, garbage_collect.s(),
+        name='garbage collect tasks')

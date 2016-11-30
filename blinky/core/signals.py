@@ -1,5 +1,6 @@
 from django.dispatch import Signal
 
 
-worker_instance_online = Signal(providing_args=["worker_instance"])
-worker_instance_offline = Signal(providing_args=["worker_instance"])
+worker_online = Signal(providing_args=["worker_type"])
+worker_offline = Signal(providing_args=["worker_type"])
+worker_capacity_change = Signal(providing_args=["worker_type", "capacity"])

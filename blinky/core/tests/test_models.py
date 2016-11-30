@@ -125,12 +125,12 @@ class TestWorkerType(BlinkMixin, TestCase):
 
     def test_capacity_at_timestamp(self):
         now = timezone.now()
-        eleven_seconds_ago = now - timedelta(
-            seconds=(1 + WorkerType.DEFAULT_HEARTBEAT_INTERVAL))
+        ten_seconds_ago = now - timedelta(
+            seconds=WorkerType.DEFAULT_HEARTBEAT_INTERVAL)
         system, worker_type = self.mk_system_capacity(
             online_count=0, offline_count=1, offline_delta=1, now=now)
         self.assertEqual(worker_type.capacity(), WorkerType.CAPACITY_UNKNOWN)
-        self.assertEqual(worker_type.capacity(eleven_seconds_ago),
+        self.assertEqual(worker_type.capacity(ten_seconds_ago),
                          WorkerType.CAPACITY_GOOD)
 
     def test_last_seen_at(self):

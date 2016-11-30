@@ -2,7 +2,7 @@ from django.test import TestCase
 from mock import Mock
 from datetime import timedelta
 
-from .utils import BlinkMixin, reload_record
+from .utils import BlinkMixin
 from ..models import WorkerType
 from ..tasks import poll_worker_types
 

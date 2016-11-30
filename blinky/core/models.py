@@ -64,8 +64,8 @@ class WorkerType(models.Model):
     def is_online(self, timestamp=None):
         return any(self.instances_online(timestamp=timestamp))
 
-    def capacity(self):
-        instance_count = len(self.instances_online())
+    def capacity(self, timestamp=None):
+        instance_count = len(self.instances_online(timestamp))
         if not instance_count:
             return self.CAPACITY_UNKNOWN
         if self.minimum_capacity <= instance_count <= self.maximum_capacity:

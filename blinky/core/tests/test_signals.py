@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils import timezone
 from mock import Mock
 from datetime import timedelta
 
@@ -15,6 +16,9 @@ class TestSignals(BlinkMixin, TestCase):
         worker_online.connect(online_mock)
 
         heartbeat = self.mk_heartbeat()
+        heartbeat.timestamp = timezone.now() - timedelta(
+            seconds=WorkerType.DEFAULT_HEARTBEAT_INTERVAL)
+        heartbeat.save()
 
         poll_worker_types()
 
@@ -30,7 +34,7 @@ class TestSignals(BlinkMixin, TestCase):
 
         heartbeat = self.mk_heartbeat()
         heartbeat.timestamp = (heartbeat.timestamp - timedelta(
-            seconds=(WorkerType.DEFAULT_HEARTBEAT_INTERVAL + 1)))
+            seconds=(WorkerType.DEFAULT_HEARTBEAT_INTERVAL * 2)))
         heartbeat.save()
 
         poll_worker_types()

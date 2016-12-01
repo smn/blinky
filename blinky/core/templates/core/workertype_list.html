@@ -14,11 +14,11 @@
       </thead>
       <tbody>
         {% for workertype in object_list %}
-          <tr class="{% if workertype.online %}online{% else %}offline{% endif %}">
+          <tr class="{% if workertype.is_online %}online{% else %}offline{% endif %}">
             <td><a href="{% url 'workerinstances' workertype_pk=workertype.pk %}">{{workertype}}</a></td>
             <td>{{workertype.system.system_id}}</td>
             <td class="{{workertype.capacity|lower}}">{{workertype.capacity}}</td>
-            <td>{% if workertype.online %}Online{% else %}Offline{% endif %}</td>
+            <td>{% if workertype.is_online %}Online{% else %}Offline{% endif %}</td>
             <td>{% if workertype.is_active %}Yes{% else %}No{% endif %}</td>
           </tr>
         {% endfor %}

@@ -45,7 +45,9 @@ class TestHeartBeat(BlinkMixin, TestCase):
         self.assertTrue(HeartBeat.objects.exists())
         HeartBeat.garbage_collect(gc_interval=(2 * DAY))
         self.assertTrue(HeartBeat.objects.exists())
-        HeartBeat.garbage_collect(gc_interval=(1 * DAY))
+        HeartBeat.garbage_collect(gc_interval=(1 * DAY), keep=1)
+        self.assertTrue(HeartBeat.objects.exists())
+        HeartBeat.garbage_collect(gc_interval=(1 * DAY), keep=0)
         self.assertFalse(HeartBeat.objects.exists())
 
 

@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blinky.core',
-    'blinky.junebug',
+    'blinky.core.apps.CoreAppConfig',
+    'blinky.junebug.apps.JunebugConfig',
 ]
 
 MIDDLEWARE = [

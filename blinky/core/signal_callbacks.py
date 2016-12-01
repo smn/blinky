@@ -11,7 +11,7 @@ def post_save_heartbeat(sender, instance, created, **kwargs):
 
     worker_type = instance.worker_type
     worker_type.status = (WorkerType.STATUS_ONLINE
-                          if worker_type.is_alive(instance)
+                          if worker_type.is_alive()
                           else WorkerType.STATUS_OFFLINE)
     worker_type.save()
 

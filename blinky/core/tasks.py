@@ -14,7 +14,7 @@ def poll_worker_types():
         is_active=True, status=WorkerType.STATUS_ONLINE)
 
     for worker_type in worker_types:
-        if not worker_type.is_online():
+        if not worker_type.is_alive():
             worker_type.status = WorkerType.STATUS_OFFLINE
             worker_type.save()
 

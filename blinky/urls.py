@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
 from blinky.core.views import (
-    WorkerTypeList, WorkerInstanceList, HeartBeatList)
+    WorkerTypeList, WorkerInstanceList, HeartBeatList, BlinkyHealth)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -31,4 +31,5 @@ urlpatterns = [
         login_required(WorkerInstanceList.as_view()), name='workerinstances'),
     url(r'^workertype/(?P<workertype_pk>\d+)/(?P<workerinstance_pk>\d+)/$',
         login_required(HeartBeatList.as_view()), name='heartbeats'),
+    url(r'^health/', BlinkyHealth.as_view()),
 ]

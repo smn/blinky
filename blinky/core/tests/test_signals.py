@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from .utils import BlinkMixin
 from ..models import WorkerType
-from ..tasks import poll_worker_types
+from ..celery import poll_worker_types
 
 
 class TestSignals(BlinkMixin, TestCase):

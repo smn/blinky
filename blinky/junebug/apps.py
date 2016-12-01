@@ -4,4 +4,4 @@ from django.apps import AppConfig
 
 
 class JunebugConfig(AppConfig):
-    name = 'junebug'
+    name = 'blinky.junebug'

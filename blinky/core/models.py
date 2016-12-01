@@ -104,7 +104,10 @@ class WorkerInstance(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def last_seen_at(self):
-        return self.heartbeat_set.latest().timestamp
+        try:
+            return self.heartbeat_set.latest().timestamp
+        except (HeartBeat.DoesNotExist,):
+            return None
 
     def is_online(self, timestamp=None):
         """
@@ -171,10 +174,12 @@ class HeartBeat(models.Model):
                 data['timestamp']).replace(tzinfo=pytz.UTC))
 
     @classmethod
-    def garbage_collect(cls, gc_interval=(14 * DAY), now=None):
+    def garbage_collect(cls, gc_interval=(14 * DAY), keep=10, now=None):
         now = now or timezone.now()
         cut_off = now - timedelta(seconds=gc_interval)
-        return cls.objects.filter(created_at__lte=cut_off).delete()
+        heartbeats = cls.objects.filter(created_at__lte=cut_off)
+        recent_100 = heartbeats.values_list('pk', flat=True)[:keep]
+        return heartbeats.exclude(pk__in=recent_100).delete()
 
     def __unicode__(self):
         return u'%s @ %s' % (self.worker_instance, self.timestamp.isoformat())

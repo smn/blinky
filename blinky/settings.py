@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blinky.core.apps.CoreAppConfig',
     'blinky.junebug.apps.JunebugConfig',
+    'blinky.slack.apps.SlackConfig',
     'django_celery_results',
 ]
 

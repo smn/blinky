@@ -10,9 +10,7 @@ class SlackConfig(AppConfig):
         from blinky.core.signals import (
             worker_online, worker_offline, worker_capacity_change)
         from . import signal_callbacks
-        print 'slack signals!'
         worker_online.connect(signal_callbacks.on_worker_online)
         worker_offline.connect(signal_callbacks.on_worker_offline)
         worker_capacity_change.connect(
             signal_callbacks.on_worker_capacity_change)
-        print 'done!'

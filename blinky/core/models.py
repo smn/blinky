@@ -69,6 +69,11 @@ class WorkerType(models.Model):
                 for worker_instance in self.workerinstance_set.all()
                 if not worker_instance.is_online(timestamp=timestamp)]
 
+    def is_alive(self, heartbeat, timestamp=None):
+        timestamp = timestamp or timezone.now()
+        last_interval = (heartbeat.timestamp - timestamp).total_seconds()
+        return abs(last_interval) < self.heartbeat_interval
+
     def is_online(self, timestamp=None):
         return any(self.instances_online(timestamp=timestamp))
 
@@ -126,10 +131,7 @@ class WorkerInstance(models.Model):
         if not queryset.exists():
             return False
 
-        last_interval = (queryset.latest().timestamp -
-                         timestamp).total_seconds()
-
-        return abs(last_interval) < self.worker_type.heartbeat_interval
+        return self.worker_type.is_alive(queryset.latest(), timestamp)
 
     def __unicode__(self):
         return u'%s:%s @ %s with pid %s' % (

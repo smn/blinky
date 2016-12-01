@@ -1,6 +1,17 @@
+from django.http import HttpResponse
+from django.views import View
 from django.views.generic import ListView
 
 from .models import WorkerType, WorkerInstance, HeartBeat
+
+
+class BlinkyHealth(View):
+
+    def get(self, request):
+        from .tasks import health_check
+        result = health_check.apply_async()
+        result.get(timeout=float(request.GET.get('timeout', 5)))
+        return HttpResponse('ok')
 
 
 class WorkerTypeList(ListView):

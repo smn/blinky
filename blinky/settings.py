@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blinky.core.apps.CoreAppConfig',
     'blinky.junebug.apps.JunebugConfig',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -125,7 +126,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CELERY_BROKER_URL = os.environ.get(
     'BROKER_URL', 'amqp://guest:guest@localhost/')
-
+CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TASK_DEFAULT_QUEUE = 'blinky'
 CELERY_QUEUES = (
     Queue('blinky',

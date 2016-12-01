@@ -16,6 +16,7 @@ class BlinkyHealth(View):
 
 class WorkerTypeList(ListView):
     model = WorkerType
+    ordering = ('worker_friendly_name', 'worker_name')
 
 
 class WorkerInstanceList(ListView):

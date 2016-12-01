@@ -77,10 +77,7 @@ class WorkerType(models.Model):
             seconds=(self.heartbeat_interval * beats))
         beats_found = self.heartbeat_set.filter(timestamp__lte=until,
                                                 timestamp__gte=since).count()
-        alive = beats_found >= beats
-        if not alive:
-            print 'dead? %s : %s >= %s' % (self, beats_found, beats)
-        return alive
+        return beats_found >= beats
 
     def is_online(self, timestamp=None):
         return any(self.instances_online(timestamp=timestamp))

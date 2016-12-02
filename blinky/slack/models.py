@@ -11,13 +11,14 @@ class SlackWebhook(models.Model):
     channel = models.CharField(max_length=255, null=True, blank=True)
     apply_global = models.BooleanField(default=True)
     limit_worker_types = models.ManyToManyField('core.WorkerType', blank=True)
+    is_active = models.BooleanField(default=True)
 
     @classmethod
     def for_worker_type(cls, worker_type):
         return cls.objects.filter(
             models.Q(apply_global=True) |
             models.Q(limit_worker_types=worker_type)
-        ).distinct()
+        ).filter(is_active=True).distinct()
 
     def slack_payload(self, text):
         payload = {
@@ -37,3 +38,6 @@ class SlackWebhook(models.Model):
         }, json=self.slack_payload(text))
         response.raise_for_status()
         return response.json()
+
+    def __unicode__(self):
+        return self.url

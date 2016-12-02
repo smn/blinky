@@ -37,6 +37,7 @@ def run(broker_url, settings, queue_name, exchange, verbose):
 
     import django
     from django.conf import settings
+    from django.db import transaction
     django.setup()
 
     from blinky.core.models import HeartBeat
@@ -57,7 +58,8 @@ def run(broker_url, settings, queue_name, exchange, verbose):
                        queue=queue_name)
 
     def callback(ch, method, properties, body):
-        heartbeat = HeartBeat.ingest(json.loads(body))
+        with transaction.atomic():
+            heartbeat = HeartBeat.ingest(json.loads(body))
         if verbose:
             click.echo('<3 from %s at %s.' % (
                 heartbeat.worker_instance,

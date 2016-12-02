@@ -48,6 +48,7 @@ class WorkerType(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     minimum_capacity = models.IntegerField(default=0)
     maximum_capacity = models.IntegerField(default=10)
+    alive_beat_span = models.IntegerField(default=3)
     is_active = models.BooleanField(default=True)
     status = models.CharField(default=STATUS_UNKNOWN, max_length=255, choices=(
         (STATUS_OFFLINE, 'Offline'),
@@ -68,6 +69,15 @@ class WorkerType(models.Model):
         return [worker_instance
                 for worker_instance in self.workerinstance_set.all()
                 if not worker_instance.is_online(timestamp=timestamp)]
+
+    def is_alive(self, timestamp=None, beats=None):
+        beats = beats or self.alive_beat_span
+        until = timestamp or timezone.now()
+        since = until - timedelta(
+            seconds=(self.heartbeat_interval * beats))
+        beats_found = self.heartbeat_set.filter(timestamp__lte=until,
+                                                timestamp__gte=since).count()
+        return beats_found >= beats
 
     def is_online(self, timestamp=None):
         return any(self.instances_online(timestamp=timestamp))
@@ -109,6 +119,11 @@ class WorkerInstance(models.Model):
         except (HeartBeat.DoesNotExist,):
             return None
 
+    def is_on_time(self, heartbeat, timestamp=None):
+        timestamp = timestamp or timezone.now()
+        last_interval = (heartbeat.timestamp - timestamp).total_seconds()
+        return abs(last_interval) < self.worker_type.heartbeat_interval
+
     def is_online(self, timestamp=None):
         """
         Check whether or not a WorkerInstance is online.
@@ -126,10 +141,7 @@ class WorkerInstance(models.Model):
         if not queryset.exists():
             return False
 
-        last_interval = (queryset.latest().timestamp -
-                         timestamp).total_seconds()
-
-        return abs(last_interval) < self.worker_type.heartbeat_interval
+        return self.is_on_time(queryset.latest(), timestamp)
 
     def __unicode__(self):
         return u'%s:%s @ %s with pid %s' % (

@@ -17,8 +17,8 @@
           <tr>
             <td>{{heartbeat.system.system_id}}</td>
             <td><a href="{% url 'workertypes' %}">{{worker_type}}</a></td>
-            <td>{{heartbeat.timestamp}}</td>
-            <td>{{heartbeat.created_at}}</td>
+            <td>{{heartbeat.timestamp.isoformat}}</td>
+            <td>{{heartbeat.created_at.isoformat}}</td>
           </tr>
           {% endwith %}
         {% endfor %}

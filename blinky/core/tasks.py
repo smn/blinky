@@ -10,13 +10,28 @@ def health_check():
 @app.task
 def poll_worker_types():
     from blinky.core.models import WorkerType
-    worker_types = WorkerType.objects.filter(
-        is_active=True, status=WorkerType.STATUS_ONLINE)
+    from blinky.core.signals import worker_online, worker_offline
+
+    worker_types = WorkerType.objects.filter(is_active=True)
 
     for worker_type in worker_types:
-        if not worker_type.is_alive():
+        if ((worker_type.status == WorkerType.STATUS_ONLINE or
+             worker_type.status == WorkerType.STATUS_UNKNOWN) and
+                not worker_type.is_alive()):
             worker_type.status = WorkerType.STATUS_OFFLINE
             worker_type.save()
+            worker_offline.send(sender=WorkerType, worker_type=worker_type)
+            # If this happens don't try and check if it's online again
+            # this run
+            continue
+
+        if ((worker_type.status == WorkerType.STATUS_OFFLINE or
+             worker_type.status == WorkerType.STATUS_UNKNOWN) and
+                worker_type.is_alive()):
+            worker_type.status = WorkerType.STATUS_ONLINE
+            worker_type.save()
+            worker_online.send(sender=WorkerType, worker_type=worker_type)
+            continue
 
 
 @app.task

@@ -22,23 +22,3 @@ def post_save_heartbeat(sender, instance, created, **kwargs):
                                     worker_type=worker_type,
                                     current_capacity=current_capacity,
                                     previous_capacity=previous_capacity)
-
-
-def pre_save_worker_type(sender, instance, raw, **kwargs):
-    worker_type = instance
-    try:
-        db_worker_type = WorkerType.objects.get(pk=worker_type.pk)
-    except WorkerType.DoesNotExist:
-        return
-
-    from blinky.core.signals import worker_online, worker_offline
-
-    current_status = worker_type.status
-    old_status = db_worker_type.status
-    if old_status != current_status:
-        if current_status == WorkerType.STATUS_ONLINE:
-            worker_online.send(sender=WorkerType,
-                               worker_type=worker_type)
-        else:
-            worker_offline.send(sender=WorkerType,
-                                worker_type=worker_type)

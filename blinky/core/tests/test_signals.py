@@ -1,7 +1,5 @@
 from django.test import TestCase
-from django.utils import timezone
 from mock import Mock
-from datetime import timedelta
 
 from .utils import BlinkMixin
 from ..models import WorkerType
@@ -16,18 +14,10 @@ class TestSignals(BlinkMixin, TestCase):
         worker_online.connect(online_mock)
 
         heartbeat = self.mk_heartbeat()
-        heartbeat.timestamp = timezone.now() - timedelta(
-            seconds=(WorkerType.DEFAULT_HEARTBEAT_INTERVAL * 2))
-        heartbeat.save()
-
         heartbeat = self.mk_heartbeat()
-        heartbeat.timestamp = timezone.now() - timedelta(
-            seconds=(WorkerType.DEFAULT_HEARTBEAT_INTERVAL * 1))
-        heartbeat.save()
 
         worker_type = heartbeat.worker_type
-        worker_type.alive_beat_span = 1
-        worker_type.status = WorkerType.STATUS_ONLINE
+        worker_type.alive_beat_span = 2
         worker_type.save()
 
         poll_worker_types()
@@ -42,17 +32,13 @@ class TestSignals(BlinkMixin, TestCase):
         offline_mock = Mock()
         worker_offline.connect(offline_mock)
 
-        # Need to create two heartbeats because the signal handlers
-        # need to have history to look at to determine a change in status
+        # 1 heartbeat
         heartbeat = self.mk_heartbeat()
-        heartbeat.timestamp = (heartbeat.timestamp - timedelta(
-            seconds=(WorkerType.DEFAULT_HEARTBEAT_INTERVAL * 3)))
-        heartbeat.save()
 
-        heartbeat = self.mk_heartbeat()
-        heartbeat.timestamp = (heartbeat.timestamp - timedelta(
-            seconds=(WorkerType.DEFAULT_HEARTBEAT_INTERVAL * 2)))
-        heartbeat.save()
+        # 2 heartbeats needed to be alive
+        worker_type = heartbeat.worker_type
+        worker_type.alive_beat_span = 2
+        worker_type.save()
 
         poll_worker_types()
 

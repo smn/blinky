@@ -26,7 +26,8 @@ class SignalCallbackTest(BlinkMixin, TestCase):
         data = json.loads(call.request.body)
         self.assertEqual(data, {
             "username": "username",
-            "text": "worker_name came online.",
+            "text": (
+                "<http://example.com/workertype/1/|worker_name> came online."),
             "channel": "channel",
             "icon_emoji": "emoji",
         })
@@ -39,7 +40,9 @@ class SignalCallbackTest(BlinkMixin, TestCase):
         data = json.loads(call.request.body)
         self.assertEqual(data, {
             "username": "username",
-            "text": "worker_name went offline.",
+            "text": (
+                "<http://example.com/workertype/1/|worker_name> went "
+                "offline."),
             "channel": "channel",
             "icon_emoji": "emoji",
         })
@@ -55,8 +58,9 @@ class SignalCallbackTest(BlinkMixin, TestCase):
         data = json.loads(call.request.body)
         self.assertEqual(data, {
             "username": "username",
-            "text": ("Capacity for worker_name changed from "
-                     "CAPACITY_UNKNOWN to CAPACITY_GOOD."),
+            "text": (
+                "Capacity for <http://example.com/workertype/1/|worker_name> "
+                "changed from CAPACITY_UNKNOWN to CAPACITY_GOOD."),
             "channel": "channel",
             "icon_emoji": "emoji",
         })

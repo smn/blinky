@@ -22,7 +22,11 @@
             <td>{{ workertype.get_status_display }}</td>
             <td>
               {% for heartbeat in workertype.recent_heart_beats %}
-                {% if hearbeat.is_on_time %}💚{% else %}💔{% endif %}
+                <!--
+                now: {% now 'c' %}
+                heartbeat: {{ heartbeat.timestamp|date:'c' }}
+                -->
+                {% if heartbeat.is_on_time %}💚{% else %}💔{% endif %}
               {% endfor %}
             </td>
             <td>{% if workertype.is_active %}Yes{% else %}No{% endif %}</td>

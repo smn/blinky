@@ -9,8 +9,7 @@
           <td>System ID</td>
           <td>Capacity</td>
           <td>Status</td>
-          <td>Last 3 hearbeats</td>
-          <td>Last 1 heartbeat</td>
+          <td>Last 3 heartbeats</td>
           <td>Active</td>
         </tr>
       </thead>
@@ -21,8 +20,11 @@
             <td>{{workertype.system.system_id}}</td>
             <td class="{{workertype.capacity|lower}}">{{workertype.capacity}}</td>
             <td>{{ workertype.get_status_display }}</td>
-            <td>{% if workertype.is_alive %}Alive{% else %}Dead{% endif %}</td>
-            <td>{% if workertype.is_online %}Online{% else %}Offline{% endif %}</td>
+            <td>
+              {% for heartbeat in workertype.recent_heart_beats %}
+                {% if hearbeat.is_on_time %}💚{% else %}💔{% endif %}
+              {% endfor %}
+            </td>
             <td>{% if workertype.is_active %}Yes{% else %}No{% endif %}</td>
           </tr>
         {% endfor %}

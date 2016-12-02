@@ -93,6 +93,9 @@ class WorkerType(models.Model):
         elif instance_count > self.maximum_capacity:
             return self.CAPACITY_OVER
 
+    def recent_heart_beats(self, limit=3):
+        return self.heartbeat_set.order_by('-timestamp')[:limit]
+
     def __unicode__(self):
         return self.worker_friendly_name or self.worker_name
 
@@ -115,11 +118,6 @@ class WorkerInstance(models.Model):
         except (HeartBeat.DoesNotExist,):
             return None
 
-    def is_on_time(self, heartbeat, timestamp=None):
-        timestamp = timestamp or timezone.now()
-        last_interval = (heartbeat.timestamp - timestamp).total_seconds()
-        return abs(last_interval) < self.worker_type.heartbeat_interval
-
     def is_online(self, timestamp=None):
         """
         Check whether or not a WorkerInstance is online.
@@ -137,7 +135,7 @@ class WorkerInstance(models.Model):
         if not queryset.exists():
             return False
 
-        return self.is_on_time(queryset.latest(), timestamp)
+        return queryset.latest().is_on_time(timestamp)
 
     def __unicode__(self):
         return u'%s:%s @ %s with pid %s' % (
@@ -162,6 +160,11 @@ class HeartBeat(models.Model):
             system=self.system, worker_type=self.worker_type,
             worker_instance=self.worker_instance,
             timestamp__lt=self.timestamp).order_by('-timestamp').first()
+
+    def is_on_time(self, timestamp=None):
+        timestamp = timestamp or timezone.now()
+        last_interval = (self.timestamp - timestamp).total_seconds()
+        return abs(last_interval) < self.worker_type.heartbeat_interval
 
     @classmethod
     def ingest(cls, data):

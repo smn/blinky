@@ -10,7 +10,7 @@ class SlackWebhook(models.Model):
     icon_emoji = models.CharField(max_length=255, null=True, blank=True)
     channel = models.CharField(max_length=255, null=True, blank=True)
     apply_global = models.BooleanField(default=True)
-    limit_worker_types = models.ManyToManyField('core.WorkerType')
+    limit_worker_types = models.ManyToManyField('core.WorkerType', blank=True)
 
     @classmethod
     def for_worker_type(cls, worker_type):

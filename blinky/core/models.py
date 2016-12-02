@@ -93,16 +93,6 @@ class WorkerType(models.Model):
         elif instance_count > self.maximum_capacity:
             return self.CAPACITY_OVER
 
-    @classmethod
-    def garbage_collect(cls, gc_interval=(1 * MINUTE), now=None):
-        now = now or timezone.now()
-        for worker_type in cls.objects.all():
-            last_instance = worker_type.last_seen_instance()
-            delta = last_instance.last_seen_at() - now
-            worker_type.is_active = (
-                abs(delta.total_seconds()) < float(gc_interval))
-            worker_type.save()
-
     def __unicode__(self):
         return self.worker_friendly_name or self.worker_name
 

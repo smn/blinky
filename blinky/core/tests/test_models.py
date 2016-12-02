@@ -4,7 +4,7 @@ import pytz
 
 from django.test import TestCase
 from django.utils import timezone
-from .utils import BlinkMixin, reload_record
+from .utils import BlinkMixin
 from blinky.core.models import (
     System, WorkerInstance, WorkerType, HeartBeat, DAY)
 
@@ -148,18 +148,6 @@ class TestWorkerType(BlinkMixin, TestCase):
         worker_type = heartbeat1.worker_type
         self.assertEqual(worker_type.last_seen_instance(),
                          heartbeat1.worker_instance)
-
-    def test_garbage_collect_remain_active(self):
-        system, worker_type = self.mk_system_capacity(online_count=1)
-        self.assertTrue(worker_type.is_active)
-        WorkerType.garbage_collect()
-        self.assertTrue(reload_record(worker_type).is_active)
-
-    def test_garbage_collect_flip_in_active(self):
-        system, worker_type = self.mk_system_capacity(offline_count=1)
-        self.assertTrue(worker_type.is_active)
-        WorkerType.garbage_collect(gc_interval=10)
-        self.assertFalse(reload_record(worker_type).is_active)
 
 
 class TestSystem(BlinkMixin, TestCase):

@@ -8,20 +8,20 @@
           <td>Worker Type</td>
           <td>System ID</td>
           <td>Capacity</td>
-          <td>Is Alive</td>
           <td>Status</td>
-          <td>Online</td>
+          <td>Last 3 hearbeats</td>
+          <td>Last 1 heartbeat</td>
           <td>Active</td>
         </tr>
       </thead>
       <tbody>
         {% for workertype in object_list %}
-          <tr class="{% if workertype.status == workertype.STATUS_ONLINE %}online{% else %}offline{% endif %}">
+          <tr class="{% if workertype.status == workertype.STATUS_ONLINE %}online{% else %}offline{% endif %} {% if not workertype.is_active %}inactive{% endif %}">
             <td><a href="{% url 'workerinstances' workertype_pk=workertype.pk %}">{{workertype}}</a></td>
             <td>{{workertype.system.system_id}}</td>
             <td class="{{workertype.capacity|lower}}">{{workertype.capacity}}</td>
-            <td>{% if workertype.is_alive %}Alive{% else %}Dead{% endif %}</td>
             <td>{{ workertype.get_status_display }}</td>
+            <td>{% if workertype.is_alive %}Alive{% else %}Dead{% endif %}</td>
             <td>{% if workertype.is_online %}Online{% else %}Offline{% endif %}</td>
             <td>{% if workertype.is_active %}Yes{% else %}No{% endif %}</td>
           </tr>

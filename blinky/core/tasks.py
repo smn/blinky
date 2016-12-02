@@ -36,6 +36,5 @@ def poll_worker_types():
 
 @app.task
 def garbage_collect():
-    from blinky.core.models import WorkerType, HeartBeat
-    WorkerType.garbage_collect()
+    from blinky.core.models import HeartBeat
     HeartBeat.garbage_collect()

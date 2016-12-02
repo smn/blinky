@@ -16,10 +16,12 @@ def post_save_heartbeat(sender, instance, created, **kwargs):
     worker_type.save()
 
     current_capacity = worker_type.capacity()
-    if current_capacity != worker_type.capacity(timestamp):
+    previous_capacity = worker_type.capacity(timestamp)
+    if current_capacity != previous_capacity:
         worker_capacity_change.send(sender=worker_type.__class__,
                                     worker_type=worker_type,
-                                    capacity=current_capacity)
+                                    current_capacity=current_capacity,
+                                    previous_capacity=previous_capacity)
 
 
 def pre_save_worker_type(sender, instance, raw, **kwargs):

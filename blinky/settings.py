@@ -35,12 +35,14 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blinky.core.apps.CoreAppConfig',
     'blinky.junebug.apps.JunebugConfig',
+    'blinky.slack.apps.SlackConfig',
     'django_celery_results',
 ]
 
@@ -132,3 +134,5 @@ CELERY_QUEUES = (
     Queue('blinky',
           Exchange('blinky'),
           routing_key='blinky'))
+
+SITE_ID = 1

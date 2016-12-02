@@ -106,6 +106,12 @@ class WorkerType(models.Model):
     def __unicode__(self):
         return self.worker_friendly_name or self.worker_name
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('workerinstances', kwargs={
+            'workertype_pk': self.pk,
+        })
+
 
 class WorkerInstance(models.Model):
     worker_type = models.ForeignKey(WorkerType)

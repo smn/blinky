@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Heartbeats for <a href="{% url 'workerinstances' workertype_pk=workerinstance.worker_type.pk %}">{{workerinstance}}</a> {% now "SHORT_DATETIME_FORMAT" %}</h2>
+    <h2>Heartbeats for <a href="{% url 'workerinstances' workertype_pk=workerinstance.worker_type.pk %}">{{workerinstance}}</a> {% now 'c' %}</h2>
     <table>
       <thead>
         <tr>

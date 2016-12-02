@@ -37,7 +37,7 @@ class SlackWebhook(models.Model):
             'Content-Type': 'application/json',
         }, json=self.slack_payload(text))
         response.raise_for_status()
-        return response.json()
+        return response
 
     def __unicode__(self):
         return self.url

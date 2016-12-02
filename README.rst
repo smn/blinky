@@ -16,7 +16,5 @@ Blinky provides uptime for Vumi workers & Junebug Channels
     -e SUPERUSER_PASSWORD='password' \
     -e BROKER_URL='amqp://username:password@host/vhost' \
     -e DATABASE_URL='sqlite:////full/path/to/your/database/file.sqlite' \
-    -e SLACK_CLIENT_ID='slack_client_id' \
-    -e SLACK_CLIENT_SECRET='slack_client_secret' \
     -p 8000:8000 \
     sdehaan/blinky

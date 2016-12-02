@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import SlackWebhook
 
-# Register your models here.
+
+@admin.register(SlackWebhook)
+class SlackWebhookAdmin(admin.ModelAdmin):
+    pass

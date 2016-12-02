@@ -9,4 +9,3 @@ requests==2.12.1
 responses==0.5.1
 six==1.10.0
 django-celery-results==1.0.1
-django-slack-oauth==0.6.1

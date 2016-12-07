@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load core_tags %}
 
 {% block content %}
     <h2>Worker Types {% now 'c' %}</h2>
@@ -26,7 +27,7 @@
                 now: {% now 'c' %}
                 heartbeat: {{ heartbeat.timestamp|date:'c' }}
                 -->
-                {% if heartbeat.is_on_time %}💚{% else %}💔{% endif %}
+                {% if heartbeat|was_on_time %}💚{% else %}💔{% endif %}
               {% endfor %}
             </td>
             <td>{% if workertype.is_active %}Yes{% else %}No{% endif %}</td>

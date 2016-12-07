@@ -45,6 +45,7 @@ class WorkerType(models.Model):
     worker_name = models.CharField(max_length=255)
     heartbeat_interval = models.IntegerField(
         default=DEFAULT_HEARTBEAT_INTERVAL)
+    allowable_interval_variance = models.FloatField(default=0.1)
     created_at = models.DateTimeField(auto_now_add=True)
     minimum_capacity = models.IntegerField(default=0)
     maximum_capacity = models.IntegerField(default=10)
@@ -55,6 +56,9 @@ class WorkerType(models.Model):
         (STATUS_ONLINE, 'Online'),
         (STATUS_UNKNOWN, 'Unknown'),
     ))
+
+    def allowed_interval(self):
+        return (1 + self.allowable_interval_variance) * self.heartbeat_interval
 
     def last_seen_instance(self):
         return max(self.workerinstance_set.all(),
@@ -74,7 +78,7 @@ class WorkerType(models.Model):
         beats = beats or self.alive_beat_span
         until = timestamp or timezone.now()
         since = until - timedelta(
-            seconds=(self.heartbeat_interval * beats))
+            seconds=(self.allowed_interval() * beats))
         beats_found = self.heartbeat_set.filter(timestamp__lte=until,
                                                 timestamp__gte=since).count()
         return beats_found >= beats
@@ -161,10 +165,15 @@ class HeartBeat(models.Model):
             worker_instance=self.worker_instance,
             timestamp__lt=self.timestamp).order_by('-timestamp').first()
 
-    def is_on_time(self, timestamp=None):
-        timestamp = timestamp or timezone.now()
+    def next(self):
+        return HeartBeat.objects.filter(
+            system=self.system, worker_type=self.worker_type,
+            worker_instance=self.worker_instance,
+            timestamp__gt=self.timestamp).order_by('timestamp').first()
+
+    def is_on_time(self, timestamp):
         last_interval = (self.timestamp - timestamp).total_seconds()
-        return abs(last_interval) < self.worker_type.heartbeat_interval
+        return abs(last_interval) < self.worker_type.allowed_interval()
 
     @classmethod
     def ingest(cls, data):

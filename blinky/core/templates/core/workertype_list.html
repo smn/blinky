@@ -8,7 +8,7 @@
         <tr>
           <td>Worker Type</td>
           <td>System ID</td>
-          <td>Capacity</td>
+          {# <td>Capacity</td>#}
           <td>Status</td>
           <td>Last heartbeat</td>
           <td>Active</td>
@@ -19,7 +19,7 @@
           <tr class="{% if workertype.status == workertype.STATUS_ONLINE %}online{% else %}offline{% endif %} {% if not workertype.is_active %}inactive{% endif %}">
             <td><a href="{% url 'workerinstances' workertype_pk=workertype.pk %}">{{workertype}}</a></td>
             <td>{{workertype.system.system_id}}</td>
-            <td class="{{workertype.capacity|lower}}">{{workertype.capacity}}</td>
+            {# <td class="{{workertype.capacity|lower}}">{{workertype.capacity}}</td>#}
             <td>{{ workertype.get_status_display }}</td>
             <td>
               {% if workertype.heartbeat_set.latest|was_on_time %}

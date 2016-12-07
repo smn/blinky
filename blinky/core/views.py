@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.views import View
 from django.views.generic import ListView
 
@@ -12,6 +12,20 @@ class BlinkyHealth(View):
         result = health_check.apply_async()
         result.get(timeout=float(request.GET.get('timeout', 5)))
         return HttpResponse('ok')
+
+
+class WorkerTypeHealth(View):
+
+    model = WorkerType
+
+    def get(self, request, workertype_pk):
+        try:
+            workertype = self.model.objects.get(pk=workertype_pk)
+            if workertype.is_online():
+                return HttpResponse('ok')
+            return HttpResponseNotFound('not ok')
+        except self.model.DoesNotExist:
+            return HttpResponseNotFound('not ok')
 
 
 class WorkerTypeList(ListView):

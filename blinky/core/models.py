@@ -84,7 +84,7 @@ class WorkerType(models.Model):
         return beats_found >= beats
 
     def is_online(self, timestamp=None):
-        return any(self.instances_online(timestamp=timestamp))
+        return self.is_alive(timestamp, beats=1)
 
     def capacity(self, timestamp=None):
         instance_count = len(self.instances_online(timestamp))

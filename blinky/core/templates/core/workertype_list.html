@@ -12,6 +12,7 @@
           <td>Status</td>
           <td>Last heartbeat</td>
           <td>Active</td>
+          <td>Health URL</td>
         </tr>
       </thead>
       <tbody>
@@ -29,6 +30,11 @@
               {% endif %}
             </td>
             <td>{% if workertype.is_active %}Yes{% else %}No{% endif %}</td>
+            <td>
+              <a href="{% url 'workertypehealth' workertype_pk=workertype.pk %}">
+                Health url
+              </a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>

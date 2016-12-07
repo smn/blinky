@@ -9,11 +9,11 @@ class HeartBeatAdmin(admin.ModelAdmin):
 
 
 @admin.register(WorkerType)
-class WorkerAdmin(admin.ModelAdmin):
+class WorkerTypeAdmin(admin.ModelAdmin):
     list_filter = ('system',)
     list_display = (
         'system', 'worker_name', 'worker_friendly_name', 'created_at',
-        'status', 'capacity', 'last_seen_at')
+        'status', 'last_seen_at')
 
     def last_seen_at(self, worker_type):
         last_instance = worker_type.last_seen_instance()

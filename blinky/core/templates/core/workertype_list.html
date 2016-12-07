@@ -10,7 +10,7 @@
           <td>System ID</td>
           <td>Capacity</td>
           <td>Status</td>
-          <td>Last 3 heartbeats</td>
+          <td>Last heartbeat</td>
           <td>Active</td>
         </tr>
       </thead>
@@ -22,13 +22,11 @@
             <td class="{{workertype.capacity|lower}}">{{workertype.capacity}}</td>
             <td>{{ workertype.get_status_display }}</td>
             <td>
-              {% for heartbeat in workertype.recent_heart_beats %}
-                <!--
-                now: {% now 'c' %}
-                heartbeat: {{ heartbeat.timestamp|date:'c' }}
-                -->
-                {% if heartbeat|was_on_time %}💚{% else %}💔{% endif %}
-              {% endfor %}
+              {% if workertype.heartbeat_set.latest|was_on_time %}
+              💚
+              {% else %}
+              💔
+              {% endif %}
             </td>
             <td>{% if workertype.is_active %}Yes{% else %}No{% endif %}</td>
           </tr>

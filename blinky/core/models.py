@@ -97,9 +97,6 @@ class WorkerType(models.Model):
         elif instance_count > self.maximum_capacity:
             return self.CAPACITY_OVER
 
-    def recent_heart_beats(self, limit=3):
-        return self.heartbeat_set.order_by('-timestamp')[:limit]
-
     def __unicode__(self):
         return self.worker_friendly_name or self.worker_name
 
